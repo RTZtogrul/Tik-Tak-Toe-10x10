@@ -11,6 +11,8 @@ width = height = (sq+1)*margin+sq*size_block
 
 size_win = (width,height)
 screen= pygame.display.set_mode(size_win)
+
+
 костыль =str(sq)
 костыль2 = костыль+"x"+костыль
 pygame.display.set_caption(костыль2)

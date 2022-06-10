@@ -1,5 +1,4 @@
 import socket
-import pickle
 import virtual
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
