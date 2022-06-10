@@ -2,7 +2,6 @@ import pygame , sys
 
 
 
-
 pygame.init()
 size_block=45
 margin = 8
@@ -21,12 +20,18 @@ black = (0,0,0)
 red = (255,0,0)
 green = (0,255,0)
 white = (255,255,255)
-mass = [[0]*sq for i in range(sq)]
 
 game = True
 turn = True
 start_turn = turn
 game_over = False
+
+def create_emty_mass():
+    return [["0"]*sq for i in range(sq)]
+
+mass = create_emty_mass()
+
+
 
 
 def win(all_lines,disc):                 
@@ -72,16 +77,16 @@ while game:
             x_mouse,y_mouse = pygame.mouse.get_pos()
             col = x_mouse // (size_block+margin)
             row = y_mouse // (size_block+margin)
-            if turn and mass[row][col] == 0  :
+            if turn and mass[row][col] == "0" :
                 mass[row][col] = "x"
                 turn = not turn
-            elif mass[row][col] == 0 and not turn:
+            elif mass[row][col] == "0" and not turn:
                 mass[row][col] = "o"
                 turn = not turn
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             screen.fill(black)
             game_over =False
-            mass = [[0]*sq for i in range(sq)]
+            mass = create_emty_mass()
             turn = start_turn
             start_turn = not start_turn
 
