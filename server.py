@@ -10,7 +10,7 @@ server.listen(1)
 user , adress = server.accept()
 
 
-game = virtual.Game("o")
+game = virtual.Game("o",user)
 
 
 while True:
@@ -18,13 +18,11 @@ while True:
         
         game.quit_button(event)
         
-        game.draw_screen()
+        game.get_info()
         
         game.make_move(event)
         
-        game.send_info(user,game.mass)
-        
-        game.get_info(user)
+        game.send_info(game.mass)
         
        
     

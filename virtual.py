@@ -35,20 +35,22 @@ class Pos(NamedTuple):
 class Game:
     player_signs = ["x","o"]
     screen = pygame.display.set_mode(size_win)
-    mass = create_emty_mass()
     turn : bool
+    mass : list
     
     
-    def __init__(self,sign):
+    def __init__(self,sign,user):
         self.sign = sign
+        self.user = user
         if sign == "x":
             self.turn = True
+            self.mass = create_emty_mass()
         if sign == "o":
             self.turn = False
+
         
-        
-    def get_info(self,user):
-        response = user.recv(1024)
+    def get_info(self):
+        response = self.user.recv(1024)
         try:
             data = pickle.loads(response)
         except: # какая то рандомная ошибка, хз, но вродь пашет 
@@ -56,6 +58,8 @@ class Game:
         
         self.upd_main_mass(data)
         self.turn = True
+        
+
     
     
     @staticmethod
@@ -68,9 +72,8 @@ class Game:
         return pos
     
     
-    @staticmethod
-    def send_info(user,data):
-        user.send(pickle.dumps(data))
+    def send_info(self, data):
+        self.user.send(pickle.dumps(data))
         
         
     @staticmethod

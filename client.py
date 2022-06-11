@@ -6,7 +6,7 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(("127.0.0.1",1234))
 
 
-game = virtual.Game("x")
+game = virtual.Game("x",client)
 
 
 while True:
@@ -18,9 +18,9 @@ while True:
         
         game.make_move(event)
         
-        game.send_info(client,game.mass)
+        game.send_info(game.mass)
         
-        game.get_info(client)
+        game.get_info()
         
        
 
