@@ -1,4 +1,6 @@
 import pickle , pygame , sys
+from typing import NamedTuple
+
 
 
 pygame.init()
@@ -7,10 +9,10 @@ pygame.init()
 size_block=45
 margin = 8
 sq = 10
+padding = 0
 width = height = (sq+1)*margin+sq*size_block
-size_win = (width,height)
+size_win = (width,height+padding)
 
-screen = pygame.display.set_mode(size_win)
 
 
 black = (0,0,0)
@@ -25,22 +27,35 @@ def create_emty_mass():
 
 
     
+class Pos(NamedTuple):
+    col: int
+    row: int
+    
+    
 class Game:
     player_signs = ["x","o"]
+    screen = pygame.display.set_mode(size_win)
+    mass = create_emty_mass()
+    turn : bool
     
-    def __init__(self):
-        self.mass = create_emty_mass()
+    
+    def __init__(self,sign):
+        self.sign = sign
+        if sign == "x":
+            self.turn = True
+        if sign == "o":
+            self.turn = False
         
         
-    @staticmethod
-    def get_info(user):
+    def get_info(self,user):
         response = user.recv(1024)
         try:
             data = pickle.loads(response)
         except: # какая то рандомная ошибка, хз, но вродь пашет 
             pass
         
-        return data
+        self.upd_main_mass(data)
+        self.turn = True
     
     
     @staticmethod
@@ -48,12 +63,15 @@ class Game:
         x_mouse,y_mouse = pygame.mouse.get_pos()
         col = x_mouse // (size_block+margin)
         row = y_mouse // (size_block+margin)
-        return (col,row)
+        
+        pos = Pos(col,row)
+        return pos
     
     
     @staticmethod
     def send_info(user,data):
         user.send(pickle.dumps(data))
+        
         
     @staticmethod
     def quit_button(event):
@@ -62,29 +80,52 @@ class Game:
             sys.exit(0)
             
             
+    def make_move(self , event):
+        if event.type == pygame.MOUSEBUTTONDOWN and self.turn:
+            pos = self.get_position()
+                
+            if self.is_free(pos.col,pos.row):
+                self.move(pos.col,pos.row)
+                self.turn = False
+                self.draw_screen()
+                    
+         
+            
+    def is_free(self,col,row):
+        if self.mass[row][col] == "0":
+            return True
+        else:
+            return False
+            
+            
+    def move(self,col,row):
+        if self.sign in self.player_signs and self.mass[row][col] == "0":
+            self.mass[row][col] = self.sign
+            return False
+        else:
+            return True
+            
+            
             
     def draw_screen(self):
-        screen.fill(white)
+        for row in range(sq):
+            for col in range(sq):
+                if self.mass[row][col] == "x":
+                    color = red
+                elif self.mass[row][col] == "o":
+                    color = green
+                else:
+                    color = white
+                x = col*size_block+(col+1)*margin
+                y = padding + row*size_block+(row+1)*margin
+                pygame.draw.rect(self.screen,color,(x,y,size_block,size_block))
+        pygame.display.update()
         
-        
-        
-        
-        
-        # for row in range(sq):
-        #     for col in range(sq):
-        #         if self.mass[row][col] == "x":
-        #             color = red
-        #         elif self.mass[row][col] == "o":
-        #             color = green
-        #         else:
-        #             color = white
-        #         x = col*size_block+(col+1)*margin
-        #         y = row*size_block+(row+1)*margin
-        #         pygame.draw.rect(screen,color,(x,y,size_block,size_block))
-                
+              
                 
     def upd_main_mass(self,mass):
         self.mass = mass
+        self.draw_screen()
         
     
     def check_win_condition(self)->str: 
